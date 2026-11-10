@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loci — a memory palace for your hands</title>
+<meta name="description" content="Pin flashcards to the room around you, then walk the route to remember them. WebXR, hands only.">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; height: 100%; background: #0b1220; color: #f2f6fb;
+    font: 18px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  #stage, #stage canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #home { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    padding: 16px; background: rgba(8, 14, 24, 0.78); overflow: auto; }
+  .card { max-width: 30rem; width: 100%; text-align: center; padding: 28px 24px; border: 2px solid #5ee6ff;
+    border-radius: 20px; background: #0f1b2d; }
+  h1 { margin: 0 0 4px; font-size: 3rem; letter-spacing: 0.04em; }
+  .tag { margin: 0 0 16px; font-size: 1.15rem; }
+  #today { margin: 0 0 20px; font-weight: 700; color: #ffd166; }
+  button { font: inherit; font-weight: 700; color: #06121c; background: #5ee6ff; border: 0; border-radius: 14px;
+    padding: 14px 28px; min-width: 12rem; min-height: 52px; cursor: pointer; }
+  button:disabled { opacity: 0.6; cursor: default; }
+  button:focus-visible, a:focus-visible { outline: 3px solid #ffd166; outline-offset: 3px; }
+  button.ghost { display: block; margin: 12px auto 0; background: transparent; color: #f2f6fb; border: 2px solid #f2f6fb; }
+  #enter { font-size: 1.3rem; }
+  #note { min-height: 1.5em; margin: 14px 0 0; color: #ffd166; }
+  .small { margin: 10px 0 0; font-size: 0.9rem; color: #c3d0df; }
+  a { color: #5ee6ff; }
+  #bar { position: fixed; left: 0; right: 0; top: 0; padding: 8px 12px; background: rgba(8, 14, 24, 0.85);
+    font-size: 0.95rem; text-align: center; }
+  #bar button { min-width: 0; min-height: 0; padding: 4px 14px; margin-left: 10px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div id="stage" aria-hidden="true"></div>
+
+<main id="home">
+  <div class="card">
+    <h1>Loci</h1>
+    <p class="tag">Pin what you want to remember to the room around you, then walk the route to recall it.</p>
+    <p id="today" aria-live="polite">&nbsp;</p>
+    <button id="enter" disabled>Loading…</button>
+    <button id="demo" class="ghost" hidden>Try it with a mouse</button>
+    <p id="note" role="status"></p>
+    <p class="small">Hands only. Works seated, with one hand. <a href="decks.html">Make your own deck</a></p>
+    <p class="small">Built with AI assistance (Claude, Anthropic).</p>
+  </div>
+</main>
+
+<div id="bar" hidden>
+  Mouse demo: drag a card to pin it · drag empty space to look · wheel changes distance · click the “Menu” disc for Walk
+  <button id="back">Back</button>
+</div>
+
+<noscript><p style="position:fixed;bottom:0;padding:12px">Loci needs JavaScript and WebGL.</p></noscript>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

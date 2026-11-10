@@ -1,0 +1,10 @@
+{
+  "name": "loci",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node --test tests/srs.test.mjs && node tests/e2e.mjs"
+  },
+  "devDependencies": { "iwer": "^2.5.0" }
+}

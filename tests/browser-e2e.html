@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loci e2e (browser)</title>
+<!-- Browser port of tests/e2e.mjs: no Node, no Playwright. Serve loci/ over http and open this page. -->
+<script src="../vendor/iwer.min.js"></script>
+<script>
+// Two roles. Runner (no ?host): drives the app in the iframe below.
+// Host (?host=1&xr=&vr=&target=&nonce=): the iframe document. It installs the emulated Quest 3
+// BEFORE the app runs (the equivalent of Playwright's addInitScript), then becomes the target
+// page: history.replaceState to its URL (so location.search, relative URLs and localStorage are
+// the real ones) and document.open/write of its HTML (same Window, so IWER stays installed).
+function quest(vrOnly) { // same as e2e.mjs
+  const d = new IWER.XRDevice(IWER.metaQuest3);
+  d.installRuntime({ forceInstall: true });
+  d.primaryInputMode = 'hand';
+  if (vrOnly) { const ask = navigator.xr.isSessionSupported.bind(navigator.xr); navigator.xr.isSessionSupported = m => (m === 'immersive-ar' ? Promise.resolve(false) : ask(m)); }
+  window.__dev = d;
+}
+const Q = new URLSearchParams(location.search);
+if (Q.has('host')) {
+  window.__isHost = true;
+  if (Q.get('xr') === '1') quest(Q.get('vr') === '1');
+  const target = Q.get('target'), nonce = Q.get('nonce'), P = parent;
+  fetch(target).then(r => r.text()).then(html => {
+    history.replaceState(null, '', target);
+    document.open(); // erases window listeners, so the error hooks come after it
+    addEventListener('error', e => P.__errors.push(String(e.message)));
+    addEventListener('unhandledrejection', e => P.__errors.push('unhandled rejection: ' + ((e.reason && e.reason.message) || e.reason)));
+    const ce = console.error.bind(console);
+    console.error = (...a) => { P.__errors.push(a.map(String).join(' ')); ce(...a); };
+    window.__hostNonce = nonce;
+    document.write(html);
+    document.close();
+  }, e => P.__errors.push('host fetch failed: ' + e));
+} else {
+  addEventListener('DOMContentLoaded', () => {
+    const s = document.createElement('script'); s.type = 'module'; s.src = 'browser-e2e.js'; document.head.append(s);
+  });
+}
+</script>
+<style>
+  body { margin: 0; padding: 8px; font: 13px/1.4 ui-monospace, Consolas, monospace; background: #111; color: #ddd; }
+  #out { white-space: pre-wrap; margin: 0 0 8px; }
+  #app { border: 1px solid #444; background: #000; display: block; }
+</style>
+</head>
+<body>
+<pre id="out">running…
+</pre>
+<iframe id="app" width="1000" height="700" title="Loci under test"></iframe>
+</body>
+</html>
